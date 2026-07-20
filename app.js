@@ -1,22 +1,21 @@
-
 (function(){
+  var unlocked=localStorage.getItem('spw_on')==='1';
   var credits=+(localStorage.getItem('soft-paywall_cr')||10);
   var root=document.getElementById('app');
-  function save(){localStorage.setItem('soft-paywall_cr',credits);}
+  function save(){localStorage.setItem('soft-paywall_cr',credits);localStorage.setItem('spw_on',unlocked?'1':'0');}
   function render(){
-    root.innerHTML='<div class="card" style="border-color:#f472b6"><b>18+</b> Fictional entertainment · 실관계/결제 아님</div>'
-      +'<div class="card">크레딧 <b style="color:var(--gold)">'+credits+'</b> (가상)<div class="row" style="margin-top:10px"><button id="use">1 사용 · 체험</button><button class="sec" id="get">무료 +3 (쿨다운 로컬)</button></div><div id="log" class="sub" style="margin-top:10px"></div></div>';
-    document.getElementById('use').onclick=function(){
-      if(credits<=0){document.getElementById('log').textContent='크레딧 없음 · 무료 충전 또는 후원 문의';return;}
-      credits--;save();document.getElementById('log').textContent='체험 로그: ' + new Date().toLocaleTimeString() + ' · 장면 해금(가상)';
-      render();try{legionTrack('activate',{credits:credits})}catch(e){}
+    var feed='프리뷰 피드 문단. '+(unlocked?'전체 해제됨 — 깊은 로그 공개.':'🔒 더 보려면 언락.');
+    root.innerHTML='<div class="card" style="border-color:#f472b6"><b>18+</b> Fictional · 실결제 아님</div>'
+      +'<div class="card" style="'+(unlocked?'':'filter:blur(3px)')+'">'+feed+'</div>'
+      +'<div class="card">크레딧 '+credits
+      +'<button id="un" style="margin-top:8px">언락 (-3)</button><button class="sec" id="fr">일일 +3</button></div>';
+    document.getElementById('un').onclick=function(){
+      if(unlocked){return;} if(credits<3){alert('크레딧 부족');return;} credits-=3;unlocked=true;save();render();try{legionTrack('activate',{unlock:1})}catch(e){}
     };
-    document.getElementById('get').onclick=function(){
-      var k='soft-paywall_cd_'+new Date().toDateString();
-      if(localStorage.getItem(k)){document.getElementById('log').textContent='오늘 무료 충전 완료';return;}
-      credits+=3;localStorage.setItem(k,'1');save();render();try{legionTrack('activate',{free:1})}catch(e){}
+    document.getElementById('fr').onclick=function(){
+      var k='spw_d_'+new Date().toDateString(); if(localStorage.getItem(k))return; localStorage.setItem(k,'1');credits+=3;save();render();
     };
   }
-  try{legionTrack('session_start',{app:'soft-paywall'})}catch(e){}
+  try{legionTrack('session_start',{})}catch(e){}
   render();
 })();
