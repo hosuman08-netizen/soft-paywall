@@ -11,7 +11,9 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
     '프리뷰: 도시의 밤, 문이 반쯤 열린다.',
     '챕터1: 암호 한 줄이 벽 너머 목소리로 바뀐다.',
     '챕터2: 거울 속 얼굴이 먼저 웃는다.',
-    '챕터3: 네가 남긴 발자국이 역으로 따라온다.'
+    '챕터3: 네가 남긴 발자국이 역으로 따라온다.',
+    '챕터4: 빗소리가 이름을 부른다.',
+    '챕터5: 마지막 불빛 아래 문이 다시 잠긴다.'
   ];
   var root=document.getElementById('app');
   var SHARE_BASE='https://hosuman08-netizen.github.io/soft-paywall/';
@@ -80,7 +82,7 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
       +'</div>'
       +'<div class="card">크레딧 <b style="color:var(--gold)">'+credits+'</b>'
       +'<div class="row" style="margin-top:8px"><button id="un">'+(unlocked?'다음 챕터 (-1)':'언락 (-3)')+'</button><button class="sec" id="fr">일일 +3</button></div>'
-      +(unlocked?'<button class="sec" id="shareBtn" style="margin-top:8px">📤 언락 공유</button>':'')
+      +(unlocked?'<button class="sec" id="shareBtn" style="margin-top:8px">📤 언락 공유</button><button class="sec" id="relock" style="margin-top:8px">🔒 다시 잠그기(체험)</button>':'')
       +(h.length?'<div class="sub" style="margin-top:8px">최근 언락: '+h.slice(0,3).map(function(x){return x.d;}).join(' · ')+'</div>':'')
       +'<div id="moneyPipe" style="margin-top:12px;padding:10px;border:1px solid #c5a46e44;border-radius:12px;background:#16121c;text-align:center;font-size:12px">'
       +'<div style="color:#e0b552;font-weight:700;margin-bottom:4px">💎 크레딧 · 후원 (엔터 18+)</div>'
@@ -116,6 +118,9 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
       try{legionTrack('activate',{free:1})}catch(e){}
     };
     var sb=document.getElementById('shareBtn');
+    var rl=document.getElementById('relock');
+    if(rl) rl.onclick=function(){ unlocked=false; chapter=0; save(); render(); try{legionTrack('relock',{})}catch(e){} };
+
     if(sb) sb.onclick=function(){
       var text='Soft Paywall ch'+(chapter+1)+' unlock (fictional 18+)\n'+shareUrl();
       if(navigator.share) navigator.share({text:text,url:shareUrl()}).catch(function(){});
