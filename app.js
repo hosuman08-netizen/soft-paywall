@@ -131,3 +131,5 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
   try{legionTrack('session_start',{})}catch(e){}
   render();
 })();
+
+setTimeout(function(){try{var v=+(localStorage.getItem('sp_views')||0);var a=document.getElementById('app');if(a&&!document.getElementById('spv')){var d=document.createElement('div');d.id='spv';d.style.cssText='font-size:12px;opacity:.7;margin:8px 0';d.textContent='조회 '+v;a.insertBefore(d,a.firstChild);}}catch(e){}},30);
