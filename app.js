@@ -133,3 +133,6 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
 })();
 
 setTimeout(function(){try{var v=+(localStorage.getItem('sp_views')||0);var a=document.getElementById('app');if(a&&!document.getElementById('spv')){var d=document.createElement('div');d.id='spv';d.style.cssText='font-size:12px;opacity:.7;margin:8px 0';d.textContent='조회 '+v;a.insertBefore(d,a.firstChild);}}catch(e){}},30);
+
+/* LEGION_WAVE_29_fomo_chip */
+setTimeout(function(){try{if(document.getElementById('lw_fomo_29'))return;var end=new Date(); end.setHours(24,0,0,0);var ms=Math.max(0,end-Date.now());var h=Math.floor(ms/3600000), m=Math.floor((ms%3600000)/60000);var d=document.createElement('div'); d.id='lw_fomo_29';d.style.cssText='font-size:11px;opacity:.75;margin:6px 0;color:#e0b552';d.textContent='window '+h+'h '+m+'m · W29';var app=document.getElementById('app')||document.body; app.insertBefore(d, app.firstChild);}catch(e){}},40);
