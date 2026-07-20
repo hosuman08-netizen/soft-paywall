@@ -1,3 +1,4 @@
+try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));}catch(e){}
 (function(){
   var unlocked=localStorage.getItem('spw_on')==='1';
   var unlockCount=+(localStorage.getItem('spw_n')||0);
