@@ -1,3 +1,6 @@
+
+/* LEGION_WAVE_74_today_counter */
+try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw_p35_soft_pay_today_counter')||'{}');if(_o.d!==_dk)_o={d:_dk,n:0};_o.n=(_o.n||0)+1;localStorage.setItem('lw_p35_soft_pay_today_counter',JSON.stringify(_o));}catch(e){}
 try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));}catch(e){}
 (function(){
   var unlocked=localStorage.getItem('spw_on')==='1';
