@@ -98,6 +98,10 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
     }catch(e){}
     return '나머지 언락 (-'+unlockCost()+')';
   }
+  /* WAVE78: later CTA shows remaining time. Same midnight clock. No payment. */
+  function laterCtaWithLeft(){
+    return laterCtaText()+' · 자정 '+fomoLeft();
+  }
   /* WAVE69: later expires at local midnight. Display 1-line. No payment. */
   function laterExpireIfStale(){
     try{
@@ -163,8 +167,8 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
           +'<p class="sub" style="margin-top:10px">첫장 일부 · 이어서는 로컬 소프트월 · 실결제 0</p>')
       +'</div>'
       +'<div class="card">크레딧 <b style="color:var(--gold)">'+credits+'</b>'
-      +(laterOn&&!unlocked?'<p class="sub" id="laterCta" style="margin:6px 0 0">'+laterCtaText()+' · 미리보기 유지 · 실결제 0</p><p class="sub" id="laterExp" style="margin:4px 0 0">'+laterExpLine()+'</p>':'')
-      +'<div class="row" style="margin-top:8px"><button id="un">'+(unlocked?'다음 챕터 (-1)':laterCtaText())+'</button>'
+      +(laterOn&&!unlocked?'<p class="sub" id="laterCta" style="margin:6px 0 0">'+laterCtaWithLeft()+' · 미리보기 유지 · 실결제 0</p><p class="sub" id="laterExp" style="margin:4px 0 0">'+laterExpLine()+'</p>':'')
+      +'<div class="row" style="margin-top:8px"><button id="un">'+(unlocked?'다음 챕터 (-1)':(laterOn?laterCtaWithLeft():laterCtaText()))+'</button>'
       +(unlocked?'':'<button class="sec" id="later">나중에</button>')
       +'<button class="sec" id="fr">일일 +3</button>'
       +(free1Used()?'':'<button class="sec" id="free1">오늘 무료 언락 1</button>')+'</div>'
