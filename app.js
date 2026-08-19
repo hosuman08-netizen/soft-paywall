@@ -185,6 +185,13 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
       +'<a style="color:#e0b552;margin:0 6px" href="https://hosuman08-netizen.github.io/legion-hub/?utm_source=spw&utm_medium=pipe">🎮 Arcade</a>'
       +'</div></div>';
     document.getElementById('un').onclick=function(){
+      /* WAVE147: CTA tap during highlight = instant restore. No stripe. */
+      var expHi=document.getElementById('laterExp');
+      if(expHi && expHi._hiT){
+        var chipHi=document.getElementById('laterChip');
+        if(chipHi && chipHi.onclick) chipHi.onclick();
+        return;
+      }
       if(!unlocked){
         var cost=unlockCost();
         if(credits<cost){
@@ -238,6 +245,7 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
       /* WAVE120: during highlight CTA also remaining. Same midnight. No stripe. */
       /* WAVE127: during highlight chips also remaining. Same midnight. No stripe. */
       /* WAVE133: chip tap during highlight = instant restore. No stripe. */
+      /* WAVE147: CTA (#un / #laterCta) tap during highlight = same restore. No stripe. */
       var exp=document.getElementById('laterExp');
       if(exp && exp._hiT){
         try{clearTimeout(exp._hiT);}catch(e0){}
@@ -292,6 +300,14 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
         },1600);
       }
       try{legionTrack('later_jump_left',{})}catch(e){}
+    };
+    var laterCtaEl=document.getElementById('laterCta');
+    if(laterCtaEl) laterCtaEl.onclick=function(){
+      /* WAVE147: CTA line tap during highlight = instant restore. No stripe. */
+      var exp=document.getElementById('laterExp');
+      if(exp && exp._hiT){
+        if(laterChip) laterChip.onclick();
+      }
     };
     var laterExpChip=document.getElementById('laterExpChip');
     if(laterExpChip) laterExpChip.onclick=function(){
