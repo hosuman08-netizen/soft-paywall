@@ -111,6 +111,7 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
   /* WAVE171: retap during ring = restart ring. No stripe. */
   /* WAVE175: ring tap = ring off. No stripe. */
   /* WAVE179: after ring off, keep later-chip focus. No stripe. */
+  /* WAVE184: focus retap restarts ring — separate from expire jump. No stripe. */
   function laterChipId(){ return 'laterChip'; }
   var laterChipRingTok=0;
   function laterChipRingMs(){ return 400; }
@@ -163,6 +164,14 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
     try{el.setAttribute('data-ring-off','1');}catch(e2){}
     try{el.setAttribute('data-ring-tap','1');}catch(e3){}
     holdLaterChipFocus();
+  }
+  function restartLaterChipRingFromFocus(){
+    var el=document.getElementById(laterChipId());
+    if(!el || el.getAttribute('data-focus-after-kill')!=='1') return false;
+    armLaterChipRing();
+    try{el.setAttribute('data-re-ring','1');}catch(e0){}
+    try{el.setAttribute('data-re-from-focus','1');}catch(e1){}
+    return true;
   }
   function focusLaterChip(){
     var el=document.getElementById(laterChipId());
@@ -315,6 +324,11 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
     if(laterChip) laterChip.onclick=function(){
       /* WAVE175: ring tap = ring off. No stripe. */
       if(laterChipRingIsOn()){ killLaterChipRing(); return; }
+      /* WAVE184: after kill+focus, retap restarts ring. Jump stays a later tap. */
+      if(laterChip.getAttribute('data-focus-after-kill')==='1'){
+        restartLaterChipRingFromFocus();
+        return;
+      }
       /* WAVE94: chip tap jumps to expire line. No payment. laterExpChip still clears. */
       /* WAVE102: after jump highlight expire line. Gold flash — no stripe. */
       /* WAVE112: during highlight remaining-time 1-line. Same midnight clock. No stripe. */
