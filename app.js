@@ -8,7 +8,7 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
   var credits=+(localStorage.getItem('soft-paywall_cr')||10);
   var chapter=+(localStorage.getItem('spw_ch')||0);
   var chapters=[
-    '프리뷰: 도시의 밤, 문이 반쯤 열린다.',
+    '도시의 밤, 문이 반쯤 열린다. 복도 끝 전구가 한 번 깜빡이고, 신발 한 짝이 문턱에 걸쳐 있다. 누가 먼저 이름을 불렀는지는 기억나지 않는다. 다만 그 목소리는 분명했다. 너는 그 문을 밀고 들어간다. 안쪽은 아직 따뜻하다.',
     '챕터1: 암호 한 줄이 벽 너머 목소리로 바뀐다.',
     '챕터2: 거울 속 얼굴이 먼저 웃는다.',
     '챕터3: 네가 남긴 발자국이 역으로 따라온다.',
@@ -73,15 +73,26 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
     var st=JSON.parse(localStorage.getItem('spw_streak')||'{}');
     var sc=st.count||0;
     var ready=!st.shieldLast||((new Date(dayKey(0))-new Date(st.shieldLast))/86400000)>=7;
-    var feed=unlocked ? chapters[Math.min(chapter, chapters.length-1)] : chapters[0]+' 🔒 더 보려면 언락.';
+    var showCh=unlocked?chapters[Math.min(Math.max(chapter,1), chapters.length-1)]:chapters[0];
+    var cutAt=chapters[0].indexOf('다. ');
+    if(cutAt<12) cutAt=48; else cutAt+=2;
+    var head=chapters[0].slice(0,cutAt+1);
+    var tail=chapters[0].slice(cutAt+1);
+    var laterOn=false; try{laterOn=localStorage.getItem('spw_later')==='1';}catch(e){}
     var h=unlockHist();
-    root.innerHTML='<div class="card" style="border-color:#f472b6"><b>18+</b> Fictional · 실결제 아님 · 가상 크레딧 · 일일 재잠금</div>'
-      +'<div class="card"><span class="chip">🔥 '+sc+'일'+(sc>=3&&ready?' · 🛡️':'')+'</span> <span class="chip">창 '+fomoLeft()+'</span> <span class="chip">조회 '+views()+'</span> <span class="chip">언락 '+unlockCount+'</span></div>'
-      +'<div class="card" style="'+(unlocked?'':'filter:blur(3px)')+'"><p style="font-size:15px;line-height:1.5">'+feed+'</p>'
-      +(unlocked?'<div class="sub" style="margin-top:8px">챕터 '+(chapter+1)+'/'+chapters.length+'</div>':'')
+    root.innerHTML='<div class="card" style="border-color:#f472b6"><b>18+</b> Fictional · 실결제 아님 · 가상 크레딧 · 일일 재잠금 · 숨김취소 없음</div>'
+      +'<div class="card"><span class="chip">🔥 '+sc+'일'+(sc>=3&&ready?' · 🛡️':'')+'</span> <span class="chip">창 '+fomoLeft()+'</span> <span class="chip">조회 '+views()+'</span> <span class="chip">언락 '+unlockCount+'</span>'+(unlocked?'':' <span class="chip">첫장 일부</span>')+'</div>'
+      +'<div class="card">'+(unlocked
+        ? '<p style="font-size:15px;line-height:1.5">'+showCh+'</p><div class="sub" style="margin-top:8px">챕터 '+(Math.max(chapter,1)+1)+'/'+chapters.length+'</div>'
+        : '<p style="font-size:15px;line-height:1.5">'+head+'</p>'
+          +'<p style="filter:blur(5px);user-select:none;font-size:15px;line-height:1.5;margin-top:8px">'+(tail||chapters[1])+'</p>'
+          +'<p class="sub" style="margin-top:10px">첫장 일부 · 이어서는 로컬 소프트월 · 실결제 0</p>')
       +'</div>'
       +'<div class="card">크레딧 <b style="color:var(--gold)">'+credits+'</b>'
-      +'<div class="row" style="margin-top:8px"><button id="un">'+(unlocked?'다음 챕터 (-1)':'언락 (-3)')+'</button><button class="sec" id="fr">일일 +3</button></div>'
+      +(laterOn&&!unlocked?'<p class="sub" style="margin:6px 0 0">미리보기 유지 중 · 언락·나중에 둘 다 보임</p>':'')
+      +'<div class="row" style="margin-top:8px"><button id="un">'+(unlocked?'다음 챕터 (-1)':'나머지 언락 (-3)')+'</button>'
+      +(unlocked?'':'<button class="sec" id="later">나중에</button>')
+      +'<button class="sec" id="fr">일일 +3</button></div>'
       +(unlocked?'<button class="sec" id="shareBtn" style="margin-top:8px">📤 언락 공유</button><button class="sec" id="relock" style="margin-top:8px">🔒 다시 잠그기(체험)</button>':'')
       +(h.length?'<div class="sub" style="margin-top:8px">최근 언락: '+h.slice(0,3).map(function(x){return x.d;}).join(' · ')+'</div>':'')
       +'<div id="moneyPipe" style="margin-top:12px;padding:10px;border:1px solid #c5a46e44;border-radius:12px;background:#16121c;text-align:center;font-size:12px">'
@@ -100,6 +111,7 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
         credits-=3; unlocked=true; unlockCount++; chapter=1;
         localStorage.setItem('spw_n',unlockCount);
         localStorage.setItem('spw_lockday',dayKey(0));
+        try{localStorage.removeItem('spw_later');}catch(e){}
         pushUnlock(); save(); bumpStreak(); render();
         try{legionTrack('activate',{unlock:1})}catch(e){}
         try{legionTrack('share_peak_shown',{unlock:1})}catch(e){}
@@ -119,7 +131,13 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
     };
     var sb=document.getElementById('shareBtn');
     var rl=document.getElementById('relock');
-    if(rl) rl.onclick=function(){ unlocked=false; chapter=0; save(); render(); try{legionTrack('relock',{})}catch(e){} };
+    var laterBtn=document.getElementById('later');
+    if(laterBtn) laterBtn.onclick=function(){
+      try{localStorage.setItem('spw_later','1');}catch(e){}
+      render();
+      try{legionTrack('later',{})}catch(e){}
+    };
+    if(rl) rl.onclick=function(){ unlocked=false; chapter=0; try{localStorage.removeItem('spw_later');}catch(e){} save(); render(); try{legionTrack('relock',{})}catch(e){} };
 
     if(sb) sb.onclick=function(){
       var text='Soft Paywall ch'+(chapter+1)+' unlock (fictional 18+)\n'+shareUrl();
