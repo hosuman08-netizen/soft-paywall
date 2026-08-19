@@ -237,7 +237,28 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
       /* WAVE112: during highlight remaining-time 1-line. Same midnight clock. No stripe. */
       /* WAVE120: during highlight CTA also remaining. Same midnight. No stripe. */
       /* WAVE127: during highlight chips also remaining. Same midnight. No stripe. */
+      /* WAVE133: chip tap during highlight = instant restore. No stripe. */
       var exp=document.getElementById('laterExp');
+      if(exp && exp._hiT){
+        try{clearTimeout(exp._hiT);}catch(e0){}
+        exp._hiT=null;
+        try{
+          exp.style.color='';
+          exp.style.background='';
+          exp.style.outline='';
+          exp.style.borderRadius='';
+          exp.style.padding='';
+          exp.textContent=laterExpLine();
+          var cta=document.getElementById('laterCta');
+          var unBtn=document.getElementById('un');
+          var expChip=document.getElementById('laterExpChip');
+          if(cta) cta.textContent=laterCtaWithLeft()+' · 미리보기 유지 · 실결제 0';
+          if(unBtn) unBtn.textContent=laterCtaWithLeft();
+          laterChip.textContent=laterChipText();
+          if(expChip) expChip.textContent='자정 만료 '+fomoLeft();
+        }catch(e1){}
+        return;
+      }
       if(exp){
         try{exp.scrollIntoView({behavior:'smooth',block:'center'});}catch(e){try{exp.scrollIntoView();}catch(e2){}}
         var leftLine='남은 '+fomoLeft()+' · 자정 · 실결제 0';
@@ -274,6 +295,12 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
     };
     var laterExpChip=document.getElementById('laterExpChip');
     if(laterExpChip) laterExpChip.onclick=function(){
+      /* WAVE133: expire-chip tap during highlight = instant restore. Clear still 2nd tap. */
+      var exp=document.getElementById('laterExp');
+      if(exp && exp._hiT){
+        if(laterChip) laterChip.onclick();
+        return;
+      }
       clearLater();
       render();
       try{legionTrack('later_off',{chip:'exp'})}catch(e){}
