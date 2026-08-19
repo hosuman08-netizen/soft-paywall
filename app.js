@@ -109,6 +109,7 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
   /* WAVE163: after highlight restore, focus later chip. No stripe. */
   /* WAVE168: later chip focus ring 0.4s. No stripe. */
   /* WAVE171: retap during ring = restart ring. No stripe. */
+  /* WAVE175: ring tap = ring off. No stripe. */
   function laterChipId(){ return 'laterChip'; }
   var laterChipRingTok=0;
   function laterChipRingMs(){ return 400; }
@@ -134,12 +135,22 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
     el.style.boxShadow='0 0 0 4px #e0b55255';
     try{el.setAttribute('data-chip-ring','1');}catch(e1){}
     try{el.setAttribute('data-re-ring', retr?'1':'0');}catch(e2){}
+    try{el.setAttribute('data-ring-off','0');}catch(e3){}
+    try{el.setAttribute('data-ring-tap','1');}catch(e4){}
     var tok=++laterChipRingTok;
     setTimeout(function(){
       if(tok!==laterChipRingTok) return;
       clearLaterChipRing();
     }, laterChipRingMs());
     return true;
+  }
+  function killLaterChipRing(){
+    laterChipRingTok++;
+    var el=document.getElementById(laterChipId());
+    clearLaterChipRing();
+    if(!el) return;
+    try{el.setAttribute('data-ring-off','1');}catch(e2){}
+    try{el.setAttribute('data-ring-tap','1');}catch(e3){}
   }
   function focusLaterChip(){
     var el=document.getElementById(laterChipId());
@@ -290,8 +301,8 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
     };
     var laterChip=document.getElementById('laterChip');
     if(laterChip) laterChip.onclick=function(){
-      /* WAVE171: retap during ring = restart ring. No stripe. */
-      if(laterChipRingIsOn()){ armLaterChipRing(); return; }
+      /* WAVE175: ring tap = ring off. No stripe. */
+      if(laterChipRingIsOn()){ killLaterChipRing(); return; }
       /* WAVE94: chip tap jumps to expire line. No payment. laterExpChip still clears. */
       /* WAVE102: after jump highlight expire line. Gold flash — no stripe. */
       /* WAVE112: during highlight remaining-time 1-line. Same midnight clock. No stripe. */
