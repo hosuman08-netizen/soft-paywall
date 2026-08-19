@@ -107,13 +107,39 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
     return '나중에 유지 · '+fomoLeft();
   }
   /* WAVE163: after highlight restore, focus later chip. No stripe. */
+  /* WAVE168: later chip focus ring 0.4s. No stripe. */
   function laterChipId(){ return 'laterChip'; }
+  var laterChipRingTok=0;
+  function laterChipRingMs(){ return 400; }
+  function clearLaterChipRing(){
+    var el=document.getElementById(laterChipId());
+    if(!el) return;
+    el.style.outline='';
+    el.style.outlineOffset='';
+    el.style.boxShadow='';
+    try{el.setAttribute('data-chip-ring','0');}catch(e0){}
+  }
+  function armLaterChipRing(){
+    var el=document.getElementById(laterChipId());
+    if(!el) return false;
+    el.style.outline='2px solid #e0b552';
+    el.style.outlineOffset='2px';
+    el.style.boxShadow='0 0 0 4px #e0b55255';
+    try{el.setAttribute('data-chip-ring','1');}catch(e1){}
+    var tok=++laterChipRingTok;
+    setTimeout(function(){
+      if(tok!==laterChipRingTok) return;
+      clearLaterChipRing();
+    }, laterChipRingMs());
+    return true;
+  }
   function focusLaterChip(){
     var el=document.getElementById(laterChipId());
     if(!el) return false;
     try{el.tabIndex=0;}catch(e0){}
     try{el.focus();}catch(e1){}
     try{el.scrollIntoView({block:'nearest'});}catch(e2){}
+    armLaterChipRing();
     return true;
   }
   /* WAVE69: later expires at local midnight. Display 1-line. No payment. */
