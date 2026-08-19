@@ -234,9 +234,11 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
     if(laterChip) laterChip.onclick=function(){
       /* WAVE94: chip tap jumps to expire line. No payment. laterExpChip still clears. */
       /* WAVE102: after jump highlight expire line. Gold flash — no stripe. */
+      /* WAVE112: during highlight remaining-time 1-line. Same midnight clock. No stripe. */
       var exp=document.getElementById('laterExp');
       if(exp){
         try{exp.scrollIntoView({behavior:'smooth',block:'center'});}catch(e){try{exp.scrollIntoView();}catch(e2){}}
+        exp.textContent='남은 '+fomoLeft()+' · 자정 · 실결제 0';
         exp.style.color='#e0b552';
         exp.style.background='#e0b55222';
         exp.style.outline='1px solid #e0b55288';
@@ -250,10 +252,11 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
             exp.style.outline='';
             exp.style.borderRadius='';
             exp.style.padding='';
+            exp.textContent=laterExpLine();
           }catch(e4){}
         },1600);
       }
-      try{legionTrack('later_jump_hi',{})}catch(e){}
+      try{legionTrack('later_jump_left',{})}catch(e){}
     };
     var laterExpChip=document.getElementById('laterExpChip');
     if(laterExpChip) laterExpChip.onclick=function(){
