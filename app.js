@@ -228,6 +228,13 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
     var rl=document.getElementById('relock');
     var laterBtn=document.getElementById('later');
     if(laterBtn) laterBtn.onclick=function(){
+      /* WAVE156: later button during highlight = instant restore. No stripe. */
+      var expHi=document.getElementById('laterExp');
+      if(expHi && expHi._hiT){
+        var chipHi=document.getElementById('laterChip');
+        if(chipHi && chipHi.onclick) chipHi.onclick();
+        return;
+      }
       try{
         var copy=laterCtaText();
         localStorage.setItem('spw_later','1');
