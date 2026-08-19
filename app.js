@@ -106,6 +106,16 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
   function laterChipText(){
     return '나중에 유지 · '+fomoLeft();
   }
+  /* WAVE163: after highlight restore, focus later chip. No stripe. */
+  function laterChipId(){ return 'laterChip'; }
+  function focusLaterChip(){
+    var el=document.getElementById(laterChipId());
+    if(!el) return false;
+    try{el.tabIndex=0;}catch(e0){}
+    try{el.focus();}catch(e1){}
+    try{el.scrollIntoView({block:'nearest'});}catch(e2){}
+    return true;
+  }
   /* WAVE69: later expires at local midnight. Display 1-line. No payment. */
   function laterExpireIfStale(){
     try{
@@ -272,6 +282,7 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
           laterChip.textContent=laterChipText();
           if(expChip) expChip.textContent='자정 만료 '+fomoLeft();
         }catch(e1){}
+        focusLaterChip();
         return;
       }
       if(exp){
