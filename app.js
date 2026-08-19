@@ -74,6 +74,24 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
   function onrampOpen(){try{return localStorage.getItem('spw_onramp')!=='1';}catch(e){return true;}}
   function unlockCost(){return onrampOpen()?1:3;}
   function markOnramp(){try{localStorage.setItem('spw_onramp','1');}catch(e){}}
+  /* GOLD50 TOP4: Admiral/Pelcro 레지월 감각 — 오늘 무료 언락 1. 실결제 0 */
+  function free1Used(){try{return localStorage.getItem('spw_free1_'+dayKey(0))==='1';}catch(e){return true;}}
+  function markFree1(){try{localStorage.setItem('spw_free1_'+dayKey(0),'1');}catch(e){}}
+  function grantFree1(){
+    if(free1Used()){alert('오늘 무료 언락 사용됨');return;}
+    if(!unlocked){
+      markFree1(); markOnramp(); unlocked=true; unlockCount++; chapter=1;
+      localStorage.setItem('spw_n',unlockCount);
+      localStorage.setItem('spw_lockday',dayKey(0));
+      try{localStorage.removeItem('spw_later');}catch(e){}
+      pushUnlock(); save(); bumpStreak(); render();
+      try{legionTrack('activate',{free1:1})}catch(e){}
+      return;
+    }
+    if(chapter>=chapters.length-1){ alert('오늘 스토리 끝 · 내일 재잠금 후 새 루프'); return; }
+    markFree1(); chapter++; save(); bumpStreak(); render();
+    try{legionTrack('activate',{free1:1,ch:chapter})}catch(e){}
+  }
   function render(){
     var st=JSON.parse(localStorage.getItem('spw_streak')||'{}');
     var sc=st.count||0;
@@ -86,7 +104,7 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
     var laterOn=false; try{laterOn=localStorage.getItem('spw_later')==='1';}catch(e){}
     var h=unlockHist();
     root.innerHTML='<div class="card" style="border-color:#f472b6"><b>18+</b> Fictional · 실결제 아님 · 가상 크레딧 · 일일 재잠금 · 숨김취소 없음</div>'
-      +'<div class="card"><span class="chip">🔥 '+sc+'일'+(sc>=3&&ready?' · 🛡️':'')+'</span> <span class="chip">창 '+fomoLeft()+'</span> <span class="chip">조회 '+views()+'</span> <span class="chip">언락 '+unlockCount+'</span>'+(unlocked?'':' <span class="chip">첫장 일부</span>')+(!unlocked&&onrampOpen()?' <span class="chip" id="onrampChip">첫언락 <b>−1</b></span>':'')+'</div>'
+      +'<div class="card"><span class="chip">🔥 '+sc+'일'+(sc>=3&&ready?' · 🛡️':'')+'</span> <span class="chip">창 '+fomoLeft()+'</span> <span class="chip">조회 '+views()+'</span> <span class="chip">언락 '+unlockCount+'</span>'+(unlocked?'':' <span class="chip">첫장 일부</span>')+(!unlocked&&onrampOpen()?' <span class="chip" id="onrampChip">첫언락 <b>−1</b></span>':'')+(free1Used()?' <span class="chip" id="free1Chip">오늘 무료 언락 사용</span>':' <span class="chip" id="free1Chip">오늘 무료 언락 <b>1</b></span>')+'</div>'
       +'<div class="card">'+(unlocked
         ? '<p style="font-size:15px;line-height:1.5">'+showCh+'</p><div class="sub" style="margin-top:8px">챕터 '+(Math.max(chapter,1)+1)+'/'+chapters.length+'</div>'
         : '<p style="font-size:15px;line-height:1.5">'+head+'</p>'
@@ -97,7 +115,8 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
       +(laterOn&&!unlocked?'<p class="sub" style="margin:6px 0 0">미리보기 유지 중 · 언락·나중에 둘 다 보임</p>':'')
       +'<div class="row" style="margin-top:8px"><button id="un">'+(unlocked?'다음 챕터 (-1)':'나머지 언락 (-'+unlockCost()+')')+'</button>'
       +(unlocked?'':'<button class="sec" id="later">나중에</button>')
-      +'<button class="sec" id="fr">일일 +3</button></div>'
+      +'<button class="sec" id="fr">일일 +3</button>'
+      +(free1Used()?'':'<button class="sec" id="free1">오늘 무료 언락 1</button>')+'</div>'
       +(unlocked?'<button class="sec" id="shareBtn" style="margin-top:8px">📤 언락 공유</button><button class="sec" id="relock" style="margin-top:8px">🔒 다시 잠그기(체험)</button>':'')
       +(h.length?'<div class="sub" style="margin-top:8px">최근 언락: '+h.slice(0,3).map(function(x){return x.d;}).join(' · ')+'</div>':'')
       +'<div id="moneyPipe" style="margin-top:12px;padding:10px;border:1px solid #c5a46e44;border-radius:12px;background:#16121c;text-align:center;font-size:12px">'
@@ -135,6 +154,10 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
       localStorage.setItem(k,'1'); credits+=3; save(); render();
       try{legionTrack('activate',{free:1})}catch(e){}
     };
+    var f1=document.getElementById('free1');
+    if(f1) f1.onclick=grantFree1;
+    var f1c=document.getElementById('free1Chip');
+    if(f1c && !free1Used()) f1c.onclick=grantFree1;
     var sb=document.getElementById('shareBtn');
     var rl=document.getElementById('relock');
     var laterBtn=document.getElementById('later');
