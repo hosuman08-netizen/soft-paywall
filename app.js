@@ -91,6 +91,13 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
   /* GOLD50 TOP2: Piano/Admiral 다이나믹 오퍼. 첫언락 1회 −1, 이후 −3. 실결제 0 */
   function onrampOpen(){try{return localStorage.getItem('spw_onramp')!=='1';}catch(e){return true;}}
   function unlockCost(){return onrampOpen()?1:3;}
+  function laterCtaText(){
+    try{
+      var stored=localStorage.getItem('spw_later_cta');
+      if(localStorage.getItem('spw_later')==='1' && stored) return stored;
+    }catch(e){}
+    return '나머지 언락 (-'+unlockCost()+')';
+  }
   function markOnramp(){try{localStorage.setItem('spw_onramp','1');}catch(e){}}
   /* GOLD50 TOP4: Admiral/Pelcro 레지월 감각 — 오늘 무료 언락 1. 실결제 0 */
   function free1Used(){try{return localStorage.getItem('spw_free1_'+dayKey(0))==='1';}catch(e){return true;}}
@@ -101,7 +108,7 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
       markFree1(); markOnramp(); unlocked=true; unlockCount++; chapter=1;
       localStorage.setItem('spw_n',unlockCount);
       localStorage.setItem('spw_lockday',dayKey(0));
-      try{localStorage.removeItem('spw_later'); localStorage.removeItem('spw_relock_why'); localStorage.removeItem('spw_relock_at'); localStorage.removeItem('spw_relock_day');}catch(e){}
+      try{localStorage.removeItem('spw_later'); localStorage.removeItem('spw_later_cta'); localStorage.removeItem('spw_relock_why'); localStorage.removeItem('spw_relock_at'); localStorage.removeItem('spw_relock_day');}catch(e){}
       pushUnlock(); save(); bumpStreak(); render();
       try{legionTrack('activate',{free1:1})}catch(e){}
       return;
@@ -131,8 +138,8 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
           +'<p class="sub" style="margin-top:10px">첫장 일부 · 이어서는 로컬 소프트월 · 실결제 0</p>')
       +'</div>'
       +'<div class="card">크레딧 <b style="color:var(--gold)">'+credits+'</b>'
-      +(laterOn&&!unlocked?'<p class="sub" style="margin:6px 0 0">미리보기 유지 중 · 언락·나중에 둘 다 보임</p>':'')
-      +'<div class="row" style="margin-top:8px"><button id="un">'+(unlocked?'다음 챕터 (-1)':'나머지 언락 (-'+unlockCost()+')')+'</button>'
+      +(laterOn&&!unlocked?'<p class="sub" id="laterCta" style="margin:6px 0 0">'+laterCtaText()+' · 미리보기 유지 · 실결제 0</p>':'')
+      +'<div class="row" style="margin-top:8px"><button id="un">'+(unlocked?'다음 챕터 (-1)':laterCtaText())+'</button>'
       +(unlocked?'':'<button class="sec" id="later">나중에</button>')
       +'<button class="sec" id="fr">일일 +3</button>'
       +(free1Used()?'':'<button class="sec" id="free1">오늘 무료 언락 1</button>')+'</div>'
@@ -155,7 +162,7 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
         credits-=cost; markOnramp(); unlocked=true; unlockCount++; chapter=1;
         localStorage.setItem('spw_n',unlockCount);
         localStorage.setItem('spw_lockday',dayKey(0));
-        try{localStorage.removeItem('spw_later'); localStorage.removeItem('spw_relock_why'); localStorage.removeItem('spw_relock_at'); localStorage.removeItem('spw_relock_day');}catch(e){}
+        try{localStorage.removeItem('spw_later'); localStorage.removeItem('spw_later_cta'); localStorage.removeItem('spw_relock_why'); localStorage.removeItem('spw_relock_at'); localStorage.removeItem('spw_relock_day');}catch(e){}
         pushUnlock(); save(); bumpStreak(); render();
         try{legionTrack('activate',{unlock:1})}catch(e){}
         try{legionTrack('share_peak_shown',{unlock:1})}catch(e){}
@@ -181,13 +188,17 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
     var rl=document.getElementById('relock');
     var laterBtn=document.getElementById('later');
     if(laterBtn) laterBtn.onclick=function(){
-      try{localStorage.setItem('spw_later','1');}catch(e){}
+      try{
+        var copy=laterCtaText();
+        localStorage.setItem('spw_later','1');
+        localStorage.setItem('spw_later_cta', copy);
+      }catch(e){}
       render();
       try{legionTrack('later',{})}catch(e){}
     };
     var laterChip=document.getElementById('laterChip');
     if(laterChip) laterChip.onclick=function(){
-      try{localStorage.removeItem('spw_later');}catch(e){}
+      try{localStorage.removeItem('spw_later'); localStorage.removeItem('spw_later_cta');}catch(e){}
       render();
       try{legionTrack('later_off',{})}catch(e){}
     };
@@ -195,6 +206,7 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
       unlocked=false; chapter=0;
       try{
         localStorage.removeItem('spw_later');
+        localStorage.removeItem('spw_later_cta');
         localStorage.setItem('spw_relock_why', dayKey(0));
         localStorage.setItem('spw_relock_at', String(Date.now()));
         localStorage.setItem('spw_relock_day', dayKey(0));
