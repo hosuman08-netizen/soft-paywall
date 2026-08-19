@@ -232,9 +232,12 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
     };
     var laterChip=document.getElementById('laterChip');
     if(laterChip) laterChip.onclick=function(){
-      clearLater();
-      render();
-      try{legionTrack('later_off',{})}catch(e){}
+      /* WAVE94: chip tap jumps to expire line. No payment. laterExpChip still clears. */
+      var exp=document.getElementById('laterExp');
+      if(exp){
+        try{exp.scrollIntoView({behavior:'smooth',block:'center'});}catch(e){try{exp.scrollIntoView();}catch(e2){}}
+      }
+      try{legionTrack('later_jump',{})}catch(e){}
     };
     var laterExpChip=document.getElementById('laterExpChip');
     if(laterExpChip) laterExpChip.onclick=function(){
