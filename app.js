@@ -236,6 +236,7 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
       /* WAVE102: after jump highlight expire line. Gold flash — no stripe. */
       /* WAVE112: during highlight remaining-time 1-line. Same midnight clock. No stripe. */
       /* WAVE120: during highlight CTA also remaining. Same midnight. No stripe. */
+      /* WAVE127: during highlight chips also remaining. Same midnight. No stripe. */
       var exp=document.getElementById('laterExp');
       if(exp){
         try{exp.scrollIntoView({behavior:'smooth',block:'center'});}catch(e){try{exp.scrollIntoView();}catch(e2){}}
@@ -248,8 +249,11 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
         exp.style.padding='4px 6px';
         var cta=document.getElementById('laterCta');
         var unBtn=document.getElementById('un');
+        var expChip=document.getElementById('laterExpChip');
         if(cta) cta.textContent=leftLine;
         if(unBtn) unBtn.textContent=leftLine;
+        laterChip.textContent=leftLine;
+        if(expChip) expChip.textContent=leftLine;
         try{clearTimeout(exp._hiT);}catch(e3){}
         exp._hiT=setTimeout(function(){
           try{
@@ -261,6 +265,8 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
             exp.textContent=laterExpLine();
             if(cta) cta.textContent=laterCtaWithLeft()+' · 미리보기 유지 · 실결제 0';
             if(unBtn) unBtn.textContent=laterCtaWithLeft();
+            laterChip.textContent=laterChipText();
+            if(expChip) expChip.textContent='자정 만료 '+fomoLeft();
           }catch(e4){}
         },1600);
       }
