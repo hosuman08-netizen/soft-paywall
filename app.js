@@ -110,6 +110,7 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
   /* WAVE168: later chip focus ring 0.4s. No stripe. */
   /* WAVE171: retap during ring = restart ring. No stripe. */
   /* WAVE175: ring tap = ring off. No stripe. */
+  /* WAVE179: after ring off, keep later-chip focus. No stripe. */
   function laterChipId(){ return 'laterChip'; }
   var laterChipRingTok=0;
   function laterChipRingMs(){ return 400; }
@@ -137,11 +138,21 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
     try{el.setAttribute('data-re-ring', retr?'1':'0');}catch(e2){}
     try{el.setAttribute('data-ring-off','0');}catch(e3){}
     try{el.setAttribute('data-ring-tap','1');}catch(e4){}
+    try{el.setAttribute('data-focus-after-kill','0');}catch(e5){}
     var tok=++laterChipRingTok;
     setTimeout(function(){
       if(tok!==laterChipRingTok) return;
       clearLaterChipRing();
     }, laterChipRingMs());
+    return true;
+  }
+  function holdLaterChipFocus(){
+    var el=document.getElementById(laterChipId());
+    if(!el) return false;
+    try{el.tabIndex=0;}catch(e0){}
+    try{el.focus();}catch(e1){}
+    try{el.scrollIntoView({block:'nearest'});}catch(e2){}
+    try{el.setAttribute('data-focus-after-kill','1');}catch(e3){}
     return true;
   }
   function killLaterChipRing(){
@@ -151,6 +162,7 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
     if(!el) return;
     try{el.setAttribute('data-ring-off','1');}catch(e2){}
     try{el.setAttribute('data-ring-tap','1');}catch(e3){}
+    holdLaterChipFocus();
   }
   function focusLaterChip(){
     var el=document.getElementById(laterChipId());
