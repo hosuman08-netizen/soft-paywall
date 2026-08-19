@@ -123,7 +123,7 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
     var h=unlockHist();
     root.innerHTML='<div class="card" style="border-color:#f472b6"><b>18+</b> Fictional · 실결제 아님 · 가상 크레딧 · 일일 재잠금 · 숨김취소 없음</div>'
       +(!unlocked&&relockWhyOn()?'<div class="card" id="relockWhy" style="border-color:#e0b552"><b>어제 언락 만료 · 오늘 새 장</b><p class="sub" id="relockWhen" style="margin:6px 0 0">'+(relockWhenLine()||'일일 재잠금 · 실결제 0 · 크레딧/무료1로 다시')+'</p></div>':'')
-      +'<div class="card"><span class="chip">🔥 '+sc+'일'+(sc>=3&&ready?' · 🛡️':'')+'</span> <span class="chip">창 '+fomoLeft()+'</span> <span class="chip">조회 '+views()+'</span> <span class="chip">언락 '+unlockCount+'</span>'+(unlocked?'':' <span class="chip">첫장 일부</span>')+(!unlocked&&onrampOpen()?' <span class="chip" id="onrampChip">첫언락 <b>−1</b></span>':'')+(free1Used()?' <span class="chip" id="free1Chip">오늘 무료 언락 사용</span>':' <span class="chip" id="free1Chip">오늘 무료 언락 <b>1</b></span>')+'</div>'
+      +'<div class="card"><span class="chip">🔥 '+sc+'일'+(sc>=3&&ready?' · 🛡️':'')+'</span> <span class="chip">창 '+fomoLeft()+'</span> <span class="chip">조회 '+views()+'</span> <span class="chip">언락 '+unlockCount+'</span>'+(unlocked?'':' <span class="chip">첫장 일부</span>')+(!unlocked&&onrampOpen()?' <span class="chip" id="onrampChip">첫언락 <b>−1</b></span>':'')+(free1Used()?' <span class="chip" id="free1Chip">오늘 무료 언락 사용</span>':' <span class="chip" id="free1Chip">오늘 무료 언락 <b>1</b></span>')+(laterOn&&!unlocked?' <span class="chip" id="laterChip">나중에 유지</span>':'')+'</div>'
       +'<div class="card">'+(unlocked
         ? '<p style="font-size:15px;line-height:1.5">'+showCh+'</p><div class="sub" style="margin-top:8px">챕터 '+(Math.max(chapter,1)+1)+'/'+chapters.length+'</div>'
         : '<p style="font-size:15px;line-height:1.5">'+head+'</p>'
@@ -184,6 +184,12 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
       try{localStorage.setItem('spw_later','1');}catch(e){}
       render();
       try{legionTrack('later',{})}catch(e){}
+    };
+    var laterChip=document.getElementById('laterChip');
+    if(laterChip) laterChip.onclick=function(){
+      try{localStorage.removeItem('spw_later');}catch(e){}
+      render();
+      try{legionTrack('later_off',{})}catch(e){}
     };
     if(rl) rl.onclick=function(){
       unlocked=false; chapter=0;
