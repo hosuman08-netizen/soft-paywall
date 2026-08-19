@@ -47,9 +47,24 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
       chapter=0; localStorage.setItem('spw_ch','0');
       /* GOLD50 TOP5: Piano/NYT return-loop copy */
       localStorage.setItem('spw_relock_why', dayKey(0));
+      /* WAVE50: stamp when daily expiry actually fired */
+      if(!localStorage.getItem('spw_relock_at')||localStorage.getItem('spw_relock_day')!==dayKey(0)){
+        localStorage.setItem('spw_relock_at', String(Date.now()));
+        localStorage.setItem('spw_relock_day', dayKey(0));
+      }
     }
   }catch(e){}
   function relockWhyOn(){try{return localStorage.getItem('spw_relock_why')===dayKey(0);}catch(e){return false;}}
+  function relockWhenLine(){
+    try{
+      var ts=+(localStorage.getItem('spw_relock_at')||0);
+      if(!ts) return '';
+      var d=new Date(ts);
+      var hh=String(d.getHours()).padStart(2,'0');
+      var mm=String(d.getMinutes()).padStart(2,'0');
+      return '재잠금 '+hh+':'+mm+' · 자정에 새 장 · 실결제 0';
+    }catch(e){return '';}
+  }
   function bumpStreak(){
     try{
       var st=JSON.parse(localStorage.getItem('spw_streak')||'{}');
@@ -86,7 +101,7 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
       markFree1(); markOnramp(); unlocked=true; unlockCount++; chapter=1;
       localStorage.setItem('spw_n',unlockCount);
       localStorage.setItem('spw_lockday',dayKey(0));
-      try{localStorage.removeItem('spw_later'); localStorage.removeItem('spw_relock_why');}catch(e){}
+      try{localStorage.removeItem('spw_later'); localStorage.removeItem('spw_relock_why'); localStorage.removeItem('spw_relock_at'); localStorage.removeItem('spw_relock_day');}catch(e){}
       pushUnlock(); save(); bumpStreak(); render();
       try{legionTrack('activate',{free1:1})}catch(e){}
       return;
@@ -107,7 +122,7 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
     var laterOn=false; try{laterOn=localStorage.getItem('spw_later')==='1';}catch(e){}
     var h=unlockHist();
     root.innerHTML='<div class="card" style="border-color:#f472b6"><b>18+</b> Fictional · 실결제 아님 · 가상 크레딧 · 일일 재잠금 · 숨김취소 없음</div>'
-      +(!unlocked&&relockWhyOn()?'<div class="card" id="relockWhy" style="border-color:#e0b552"><b>어제 언락 만료 · 오늘 새 장</b><p class="sub" style="margin:6px 0 0">일일 재잠금 · 실결제 0 · 크레딧/무료1로 다시</p></div>':'')
+      +(!unlocked&&relockWhyOn()?'<div class="card" id="relockWhy" style="border-color:#e0b552"><b>어제 언락 만료 · 오늘 새 장</b><p class="sub" id="relockWhen" style="margin:6px 0 0">'+(relockWhenLine()||'일일 재잠금 · 실결제 0 · 크레딧/무료1로 다시')+'</p></div>':'')
       +'<div class="card"><span class="chip">🔥 '+sc+'일'+(sc>=3&&ready?' · 🛡️':'')+'</span> <span class="chip">창 '+fomoLeft()+'</span> <span class="chip">조회 '+views()+'</span> <span class="chip">언락 '+unlockCount+'</span>'+(unlocked?'':' <span class="chip">첫장 일부</span>')+(!unlocked&&onrampOpen()?' <span class="chip" id="onrampChip">첫언락 <b>−1</b></span>':'')+(free1Used()?' <span class="chip" id="free1Chip">오늘 무료 언락 사용</span>':' <span class="chip" id="free1Chip">오늘 무료 언락 <b>1</b></span>')+'</div>'
       +'<div class="card">'+(unlocked
         ? '<p style="font-size:15px;line-height:1.5">'+showCh+'</p><div class="sub" style="margin-top:8px">챕터 '+(Math.max(chapter,1)+1)+'/'+chapters.length+'</div>'
@@ -140,7 +155,7 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
         credits-=cost; markOnramp(); unlocked=true; unlockCount++; chapter=1;
         localStorage.setItem('spw_n',unlockCount);
         localStorage.setItem('spw_lockday',dayKey(0));
-        try{localStorage.removeItem('spw_later'); localStorage.removeItem('spw_relock_why');}catch(e){}
+        try{localStorage.removeItem('spw_later'); localStorage.removeItem('spw_relock_why'); localStorage.removeItem('spw_relock_at'); localStorage.removeItem('spw_relock_day');}catch(e){}
         pushUnlock(); save(); bumpStreak(); render();
         try{legionTrack('activate',{unlock:1})}catch(e){}
         try{legionTrack('share_peak_shown',{unlock:1})}catch(e){}
@@ -172,7 +187,12 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
     };
     if(rl) rl.onclick=function(){
       unlocked=false; chapter=0;
-      try{localStorage.removeItem('spw_later'); localStorage.setItem('spw_relock_why', dayKey(0));}catch(e){}
+      try{
+        localStorage.removeItem('spw_later');
+        localStorage.setItem('spw_relock_why', dayKey(0));
+        localStorage.setItem('spw_relock_at', String(Date.now()));
+        localStorage.setItem('spw_relock_day', dayKey(0));
+      }catch(e){}
       save(); render(); try{legionTrack('relock',{})}catch(e){}
     };
 
