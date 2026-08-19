@@ -233,11 +233,27 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
     var laterChip=document.getElementById('laterChip');
     if(laterChip) laterChip.onclick=function(){
       /* WAVE94: chip tap jumps to expire line. No payment. laterExpChip still clears. */
+      /* WAVE102: after jump highlight expire line. Gold flash — no stripe. */
       var exp=document.getElementById('laterExp');
       if(exp){
         try{exp.scrollIntoView({behavior:'smooth',block:'center'});}catch(e){try{exp.scrollIntoView();}catch(e2){}}
+        exp.style.color='#e0b552';
+        exp.style.background='#e0b55222';
+        exp.style.outline='1px solid #e0b55288';
+        exp.style.borderRadius='6px';
+        exp.style.padding='4px 6px';
+        try{clearTimeout(exp._hiT);}catch(e3){}
+        exp._hiT=setTimeout(function(){
+          try{
+            exp.style.color='';
+            exp.style.background='';
+            exp.style.outline='';
+            exp.style.borderRadius='';
+            exp.style.padding='';
+          }catch(e4){}
+        },1600);
       }
-      try{legionTrack('later_jump',{})}catch(e){}
+      try{legionTrack('later_jump_hi',{})}catch(e){}
     };
     var laterExpChip=document.getElementById('laterExpChip');
     if(laterExpChip) laterExpChip.onclick=function(){
