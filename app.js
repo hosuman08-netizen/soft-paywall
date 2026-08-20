@@ -258,7 +258,7 @@ try{localStorage.setItem('sp_views',(+(localStorage.getItem('sp_views')||0)+1));
       +'<div style="color:#e0b552;font-weight:700;margin-bottom:4px">💎 크레딧 · 후원 (엔터 18+)</div>'
       +'<a style="color:#ece8f1;margin:0 6px" href="mailto:hoyashi95@gmail.com?subject=%5BSoftPaywall%5D%20support">☕ 후원 문의</a>'
       +'<a style="color:#ece8f1;margin:0 6px" href="https://hosuman08-netizen.github.io/ai-companion/?utm_source=spw&utm_medium=pipe">💋 Companion</a>'
-      +'<a style="color:#e0b552;margin:0 6px" href="https://hosuman08-netizen.github.io/legion-hub/?utm_source=spw&utm_medium=pipe">🎮 Arcade</a>'
+      +''
       +'</div></div>';
     document.getElementById('un').onclick=function(){
       /* WAVE147: CTA tap during highlight = instant restore. No stripe. */
